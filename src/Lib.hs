@@ -9,6 +9,12 @@ data Model a = Model {
 
                  -- Generate parameters and data from
                  -- the joint prior
-                 generate :: Gen RealWorld -> IO a
+                 generate :: Gen RealWorld -> IO a,
+
+                 -- Metropolis proposal *of the parameters*
+                 perturb  :: a -> Gen RealWorld -> IO (Double, a),
+
+                 -- Log Likelihood function
+                 logLikelihood :: a -> Double
                }
 
