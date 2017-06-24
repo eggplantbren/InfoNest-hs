@@ -28,6 +28,9 @@ data Model a = Model {
                  toString :: a -> String
                }
 
+-- A type for a threshold
+data Threshold a = None | Threshold a Double
+
 -- Perform a single iteration of the algorithm.
 singleRun :: Model a -> Gen RealWorld -> IO ()
 singleRun Model {..} rng = do
@@ -39,6 +42,7 @@ singleRun Model {..} rng = do
   -- Do some MCMC
   _ <- doMetropolis (0, 1000000)
                     (referencePoint, referenceLogl)
+                    None
                     Model {..}
                     rng
 
@@ -48,10 +52,11 @@ singleRun Model {..} rng = do
 
 doMetropolis :: (Int, Int)      -- (i, steps)
              -> (a, Double)     -- (particle, log likelihood)
+             -> Threshold a     -- Distance threshold
              -> Model a         -- Model specification
              -> Gen RealWorld   -- RNG
              -> IO (a, Double)  -- Updated particle and log likelihood
-doMetropolis (i, steps) (particle, logl) Model {..} rng
+doMetropolis (i, steps) (particle, logl) threshold Model {..} rng
   | i >= steps = return (particle, logl)
   | otherwise  = do
                    -- Proposal
@@ -65,8 +70,13 @@ doMetropolis (i, steps) (particle, logl) Model {..} rng
                                 else exp logAlpha
 
                    -- Test for acceptance
+                   let aboveThreshold = case threshold of
+                                None -> True
+                                Threshold refParticle value ->
+                                  distance particle' refParticle <= value
+
                    u <- uniform rng :: IO Double
-                   let result = if u < alpha'
+                   let result = if aboveThreshold && u < alpha' 
                                 then (particle', logl')
                                 else (particle, logl)
 
@@ -75,5 +85,5 @@ doMetropolis (i, steps) (particle, logl) Model {..} rng
                      putStrLn $ show (i+1) ++ " " ++ toString particle
 
                    -- Continue
-                   doMetropolis (i+1, steps) result Model {..} rng
+                   doMetropolis (i+1, steps) result threshold Model {..} rng
 
