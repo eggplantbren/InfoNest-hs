@@ -21,11 +21,18 @@ myGenerate rng = do
   let xs = U.map (+mu) ns
   return $ MyParticle mu xs
 
+-- Log likelihood
+myLogLikelihood :: MyParticle -> Double
+myLogLikelihood (MyParticle mu xs) = -0.5*theSum where
+  theSum = U.foldl' (\acc x -> acc + (x - mu)**2) 0.0 xs
+
 myModel :: Model MyParticle
-myModel = Model myGenerate 
+myModel = Model myGenerate
 
 main :: IO ()
 main = withSystemRandom . asGenIO $ \rng -> do
   particle <- myGenerate rng
   print particle
+  print $ myLogLikelihood particle
+
 
