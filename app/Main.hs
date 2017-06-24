@@ -35,17 +35,18 @@ myLogLikelihood :: MyParticle -> Double
 myLogLikelihood (MyParticle mu xs) = -0.5*theSum where
   theSum = U.foldl' (\acc x -> acc + (x - mu)**2) 0.0 xs
 
-myModel :: Model MyParticle
-myModel = Model myGenerate myPerturb myLogLikelihood
+-- To String
+myToString :: MyParticle -> String
+myToString (MyParticle mu xs) = show mu
 
+-- Model specification
+myModel :: Model MyParticle
+myModel = Model myGenerate myPerturb myLogLikelihood myToString
+
+-- Main action
 main :: IO ()
 main = withSystemRandom . asGenIO $ \rng -> do
-  particle <- myGenerate rng
-  print particle
-  print $ myLogLikelihood particle
+  singleRun myModel rng
 
-  (logH, particle') <- myPerturb particle rng
-  print logH
-  print particle'
 
 
