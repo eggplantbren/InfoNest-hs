@@ -37,7 +37,7 @@ myLogLikelihood (MyParticle mu xs) = -0.5*theSum where
 
 -- To String
 myToString :: MyParticle -> String
-myToString (MyParticle mu xs) = show mu
+myToString (MyParticle mu _) = show mu
 
 -- Model specification
 myModel :: Model MyParticle

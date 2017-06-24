@@ -34,7 +34,7 @@ singleRun Model {..} rng = do
   let referenceLogl = logLikelihood referencePoint
 
   -- Do some MCMC
-  _ <- doMetropolis (0, 1000000)
+  _ <- doMetropolis (0, 100000)
                     (referencePoint, referenceLogl)
                     Model {..}
                     rng
