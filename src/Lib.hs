@@ -1,4 +1,3 @@
-{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Lib where
@@ -46,7 +45,7 @@ doMetropolis :: (Int, Int)      -- (i, steps)
              -> Model a         -- Model specification
              -> Gen RealWorld   -- RNG
              -> IO (a, Double)  -- Updated particle and log likelihood
-doMetropolis (i, steps) !(particle, logl) (Model {..}) rng
+doMetropolis (i, steps) (particle, logl) Model {..} rng
   | i >= steps = return (particle, logl)
   | otherwise  = do
                    -- Proposal

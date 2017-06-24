@@ -9,7 +9,7 @@ import System.Random.MWC.Distributions
 
 -- An example particle type
 data MyParticle = MyParticle {
-                    myParticleMu :: !(Double),
+                    myParticleMu :: !Double,
                     myParticleXs :: !(U.Vector Double)
                   } deriving Show
 
@@ -28,7 +28,7 @@ myPerturb (MyParticle mu xs) rng = do
   scale <- (\x -> 10.0**(3.0*x)) <$> standard rng
   mu' <- (\n -> mu + scale*n) <$> standard rng
   let logH = -0.5*(mu' / 10.0)**2 + 0.5*(mu / 10.0)**2
-  return $! (logH, MyParticle mu' xs)
+  return (logH, MyParticle mu' xs)
 
 -- Log likelihood
 myLogLikelihood :: MyParticle -> Double
@@ -45,8 +45,7 @@ myModel = Model myGenerate myPerturb myLogLikelihood myToString
 
 -- Main action
 main :: IO ()
-main = withSystemRandom . asGenIO $ \rng -> do
-  singleRun myModel rng
+main = withSystemRandom . asGenIO $ \rng -> singleRun myModel rng
 
 
 
