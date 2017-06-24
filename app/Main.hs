@@ -35,17 +35,20 @@ myLogLikelihood :: MyParticle -> Double
 myLogLikelihood (MyParticle mu xs) = -0.5*theSum where
   theSum = U.foldl' (\acc x -> acc + (x - mu)**2) 0.0 xs
 
+-- Distance
+myDistance :: MyParticle -> MyParticle -> Double
+myDistance (MyParticle mu1 _) (MyParticle mu2 _) = abs (mu2 - mu1)
+
 -- To String
 myToString :: MyParticle -> String
 myToString (MyParticle mu _) = show mu
 
 -- Model specification
 myModel :: Model MyParticle
-myModel = Model myGenerate myPerturb myLogLikelihood myToString
+myModel = Model myGenerate myPerturb myLogLikelihood
+                myDistance myToString
 
 -- Main action
 main :: IO ()
 main = withSystemRandom . asGenIO $ \rng -> singleRun myModel rng
-
-
 

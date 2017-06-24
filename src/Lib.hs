@@ -21,6 +21,9 @@ data Model a = Model {
                  -- Log Likelihood function
                  logLikelihood :: a -> Double,
 
+                 -- Distance function
+                 distance :: a -> a -> Double,
+
                  -- Particle to string
                  toString :: a -> String
                }
@@ -38,7 +41,9 @@ singleRun Model {..} rng = do
                     (referencePoint, referenceLogl)
                     Model {..}
                     rng
+
   return ()
+
 
 
 doMetropolis :: (Int, Int)      -- (i, steps)
