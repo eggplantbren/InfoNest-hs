@@ -3,6 +3,7 @@
 module Lib where
 
 -- Imports
+import Control.Monad (when)
 import Control.Monad.Primitive
 --import qualified Data.Vector as V
 import System.Random.MWC
@@ -33,7 +34,7 @@ singleRun Model {..} rng = do
   let referenceLogl = logLikelihood referencePoint
 
   -- Do some MCMC
-  _ <- doMetropolis (0, 100000)
+  _ <- doMetropolis (0, 1000000)
                     (referencePoint, referenceLogl)
                     Model {..}
                     rng
@@ -64,7 +65,9 @@ doMetropolis (i, steps) (particle, logl) Model {..} rng
                                 then (particle', logl')
                                 else (particle, logl)
 
-                   putStrLn $ show (i+1) ++ " " ++ toString particle
+                   -- Print message
+                   when (mod (i+1) 1000 == 0) $
+                     putStrLn $ show (i+1) ++ " " ++ toString particle
 
                    -- Continue
                    doMetropolis (i+1, steps) result Model {..} rng
