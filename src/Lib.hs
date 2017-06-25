@@ -61,7 +61,7 @@ doNestedSampling :: (a, Double)   -- (particle, log likelihood)
 doNestedSampling !(particle, logl) reference Model {..} rng = do
   let dist = distance particle reference
 
-  if dist < 1E-3
+  if dist < 1E-4
   then do
     return ()
   else do

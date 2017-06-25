@@ -18,7 +18,7 @@ data MyParticle = MyParticle {
 myGenerate :: Gen RealWorld -> IO MyParticle
 myGenerate rng = do
   mu <- (*10.0) <$> standard rng
-  ns <- U.replicateM 10 (standard rng)
+  ns <- U.replicateM 100 (standard rng)
   let xs = U.map (+mu) ns
   return $ MyParticle mu xs
 
