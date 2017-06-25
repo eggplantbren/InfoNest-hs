@@ -4,9 +4,10 @@
 module Lib where
 
 -- Imports
-import Control.Monad (when)
+--import Control.Monad (when)
 import Control.Monad.Primitive
 import System.Random.MWC
+import System.IO
 
 -- a is the type of points in the (parameter x data) space
 data Model a = Model {
@@ -65,6 +66,7 @@ doNestedSampling !(particle, logl) reference Model {..} rng = do
     return ()
   else do
     print dist
+    hFlush stdout
 
     let threshold = Threshold reference dist
     (particle', logl') <- doMetropolis (0, 1000000)
