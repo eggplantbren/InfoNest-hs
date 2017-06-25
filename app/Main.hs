@@ -1,6 +1,7 @@
 module Main where
 
 -- Imports
+import Control.Monad (replicateM)
 import Control.Monad.Primitive
 import qualified Data.Vector.Unboxed as U
 import Lib
@@ -50,5 +51,7 @@ myModel = Model myGenerate myPerturb myLogLikelihood
 
 -- Main action
 main :: IO ()
-main = withSystemRandom . asGenIO $ \rng -> singleRun myModel rng
+main = withSystemRandom . asGenIO $ \rng -> do
+  _ <- replicateM 100 $ singleRun myModel rng
+  return ()
 

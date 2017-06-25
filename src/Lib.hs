@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE RecordWildCards #-}
 
 module Lib where
@@ -5,7 +6,6 @@ module Lib where
 -- Imports
 import Control.Monad (when)
 import Control.Monad.Primitive
---import qualified Data.Vector as V
 import System.Random.MWC
 
 -- a is the type of points in the (parameter x data) space
@@ -39,15 +39,41 @@ singleRun Model {..} rng = do
   referencePoint <- generate rng
   let referenceLogl = logLikelihood referencePoint
 
-  -- Do some MCMC
-  _ <- doMetropolis (0, 1000000)
-                    (referencePoint, referenceLogl)
-                    None
-                    Model {..}
-                    rng
+  -- Do some MCMC to generate a new point from the posterior
+  (particle, logl) <- doMetropolis (0, 1000000)
+                        (referencePoint, referenceLogl)
+                        None
+                        Model {..}
+                        rng
+
+  -- Do Nested Sampling
+  _ <- doNestedSampling (particle, logl) referencePoint Model {..} rng
 
   return ()
 
+
+doNestedSampling :: (a, Double)   -- (particle, log likelihood)
+                 -> a             -- Reference particle
+                 -> Model a       -- Model specification
+                 -> Gen RealWorld -- RNG
+                 -> IO ()
+doNestedSampling !(particle, logl) reference Model {..} rng = do
+  let dist = distance particle reference
+
+  if dist < 1E-3
+  then do
+    return ()
+  else do
+    print dist
+
+    let threshold = Threshold reference dist
+    (particle', logl') <- doMetropolis (0, 1000000)
+                                       (particle, logl)
+                                       threshold
+                                       Model {..}
+                                       rng
+
+    doNestedSampling (particle', logl') reference Model {..} rng
 
 
 doMetropolis :: (Int, Int)      -- (i, steps)
@@ -81,8 +107,8 @@ doMetropolis (i, steps) (particle, logl) threshold Model {..} rng
                                 else (particle, logl)
 
                    -- Print message
-                   when (mod (i+1) 1000 == 0) $
-                     putStrLn $ show (i+1) ++ " " ++ toString particle
+--                   when (mod (i+1) 1000 == 0) $
+--                     putStrLn $ show (i+1) ++ " " ++ toString particle
 
                    -- Continue
                    doMetropolis (i+1, steps) result threshold Model {..} rng
