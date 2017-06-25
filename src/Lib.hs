@@ -41,7 +41,7 @@ singleRun Model {..} rng = do
   let referenceLogl = logLikelihood referencePoint
 
   -- Do some MCMC to generate a new point from the posterior
-  (particle, logl) <- doMetropolis (0, 1000000)
+  (particle, logl) <- doMetropolis (0, 10000)
                         (referencePoint, referenceLogl)
                         None
                         Model {..}
@@ -69,7 +69,7 @@ doNestedSampling !(particle, logl) reference Model {..} rng = do
     hFlush stdout
 
     let threshold = Threshold reference dist
-    (particle', logl') <- doMetropolis (0, 1000000)
+    (particle', logl') <- doMetropolis (0, 10000)
                                        (particle, logl)
                                        threshold
                                        Model {..}

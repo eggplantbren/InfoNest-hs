@@ -52,6 +52,6 @@ myModel = Model myGenerate myPerturb myLogLikelihood
 -- Main action
 main :: IO ()
 main = withSystemRandom . asGenIO $ \rng -> do
-  _ <- replicateM 100 $ singleRun myModel rng
+  _ <- replicateM 1000 $ singleRun myModel rng
   return ()
 
