@@ -4,7 +4,6 @@
 module Lib where
 
 -- Imports
---import Control.Monad (when)
 import Control.Monad.Primitive
 import System.Random.MWC
 import System.IO
@@ -99,7 +98,10 @@ doMetropolis (i, steps) (particle, logl) threshold Model {..} rng
                    let logl' = logLikelihood particle'
 
                    -- Acceptance probability
-                   let logAlpha = logH + logl' - logl
+                   let logAlpha = case mode of
+                                    Standard    -> logH
+                                    Conditional -> logH + logl' - logl
+
                    let alpha' = if logAlpha > 0.0
                                 then 1.0
                                 else exp logAlpha
@@ -114,10 +116,6 @@ doMetropolis (i, steps) (particle, logl) threshold Model {..} rng
                    let result = if aboveThreshold && u < alpha' 
                                 then (particle', logl')
                                 else (particle, logl)
-
-                   -- Print message
---                   when (mod (i+1) 1000 == 0) $
---                     putStrLn $ show (i+1) ++ " " ++ toString particle
 
                    -- Continue
                    doMetropolis (i+1, steps) result threshold Model {..} rng
