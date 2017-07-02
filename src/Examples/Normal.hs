@@ -45,6 +45,6 @@ myToString (MyParticle mu _) = show mu
 
 -- Model specification
 myModel :: Model MyParticle
-myModel = Model myGenerate myPerturb myLogLikelihood
+myModel = Model Standard myGenerate myPerturb myLogLikelihood
                 myDistance myToString
 

@@ -9,8 +9,14 @@ import Control.Monad.Primitive
 import System.Random.MWC
 import System.IO
 
+-- There is 'standard' mode and 'conditional entropy' mode
+data Mode = Standard | Conditional
+
 -- a is the type of points in the (parameter x data) space
 data Model a = Model {
+
+                 -- What mode is appropriate?
+                 mode     :: Mode,
 
                  -- Generate parameters and data from
                  -- the joint prior
@@ -27,6 +33,7 @@ data Model a = Model {
 
                  -- Particle to string
                  toString :: a -> String
+
                }
 
 -- A type for a threshold
