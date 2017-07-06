@@ -35,6 +35,12 @@ data Model a = Model {
 
                }
 
+-- Sampler options
+data SamplerOptions = SamplerOptions {
+                        numParticles :: !Int,
+                        mcmcSteps    :: !Int
+                      }
+
 -- A type for a threshold
 data Threshold a = None | Threshold a Double
 
@@ -47,11 +53,13 @@ singleRun Model {..} rng = do
   let referenceLogl = logLikelihood referencePoint
 
   -- Do some MCMC to generate a new point from the posterior
-  (particle, logl) <- doMetropolis (0, 10000)
+  let genParticle = doMetropolis (0, 10000)
                         (referencePoint, referenceLogl)
                         None
                         Model {..}
-                        rng
+                        rng -- :: IO (a, Double)
+
+  (particle, logl) <- genParticle
 
   -- Do Nested Sampling
   _ <- doNestedSampling (particle, logl) referencePoint Model {..} rng
