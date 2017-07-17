@@ -45,8 +45,8 @@ data SamplerOptions = SamplerOptions {
 data Threshold a = None | Threshold a Double
 
 -- Perform a single iteration of the algorithm.
-singleRun :: Model a -> Gen RealWorld -> IO ()
-singleRun Model {..} rng = do
+singleRun :: Model a -> SamplerOptions -> Gen RealWorld -> IO ()
+singleRun Model {..} SamplerOptions {..} rng = do
 
   -- Generate the reference point
   referencePoint <- generate rng

@@ -9,6 +9,10 @@ import System.Random.MWC
 -- Main action
 main :: IO ()
 main = withSystemRandom . asGenIO $ \rng -> do
-  _ <- replicateM 1000 $ singleRun myModel rng
+
+  -- Sampler options
+  let options = SamplerOptions 10 1000
+
+  _ <- replicateM 1000 $ singleRun myModel options rng
   return ()
 
